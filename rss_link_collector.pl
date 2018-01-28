@@ -25,16 +25,15 @@ sub get_links {
   my @tags;
 
   my $page_tree = HTML::TreeBuilder::XPath -> new_from_content(decode_utf8 $content);
-
-  foreach ($page_tree -> findvalues(qq{//a/\@href})) {
-    if ($_ =~ m/^http.*/) {
-      push(@tags, $_);
+  foreach my $a_href ($page_tree -> findvalues(qq{//a/\@href})) {
+    if ($a_href =~ m/^http(s?):\/\/.*/) {
+      push(@tags, $a_href);
     }
   }
 
-  foreach($page_tree -> findvalues(qq{//link/\@href})) {
-    if ($_ =~ m/^http.*/) {
-      push(@tags, $_);
+  foreach my $link_href ($page_tree -> findvalues(qq{//link/\@href})) {
+    if ($link_href =~ m/^http(s?):\/\/.*/) {
+      push(@tags, $link_href);
     }
   }
 
@@ -42,12 +41,10 @@ sub get_links {
 }
 
 my %IsFeed = map { $_ => 1 } @{ FEED_MIME_TYPES() };
-my $rss_link_array_ref = [];
-my $atom_link_array_ref = [];
 
 my %output_json = (
-  rss  => $rss_link_array_ref,
-  atom => $atom_link_array_ref
+  rss  => [],
+  atom => []
 );
 
 my $inputfile;
@@ -58,20 +55,18 @@ my $inputfile;
   }
 }
 
-my @loszar = @{get_links($inputfile)};
+my @feed_links = @{get_links($inputfile)};
 
-foreach(@{get_links($inputfile)}) {
+foreach my $link (@feed_links) {
   my $mech = WWW::Mechanize->new(ssl_opts => {SSL_verify_mode => "IO::Socket::SSL::SSL_VERIFY_NONE", verify_hostname => 0});
-  my $feed_page = $mech->get($_);
+  my $feed_page = $mech->get($link);
 
-  if ($IsFeed{$feed_page->content_type}) {
-    if($IsFeed{$feed_page->content_type}) {
-      my $content = $feed_page->decoded_content();
-      if (index($content, "rss") > -1) {
-        push(@{$output_json{rss}}, $_);
-      } elsif (index($content, "feed") > -1) {
-        push(@{$output_json{atom}}, $_);
-      }
+  if($IsFeed{$feed_page->content_type}) {
+    my $content = $feed_page->decoded_content();
+    if (index($content, "rss") > -1) {
+      push(@{$output_json{rss}}, $link);
+    } elsif (index($content, "feed") > -1) {
+      push(@{$output_json{atom}}, $link);
     }
   }
 }
