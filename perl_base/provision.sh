@@ -29,25 +29,6 @@ yum install -y cronie
 # PERL module installation
 ####
 mkdir -p /root/.cpan/CPAN
-# if you have problems with one of the cpan servers being down
-# here a modified MyConfig.pm file that solves this issue, but
-# ideally this is not required
-# cp /docker/tkrobotng_base/MyConfig.pm /root/.cpan/CPAN/
-
-# A hack to get cpan working without questions: http://www.perlmonks.org/?node_id=548581
-# get the location of CPAN::FirstTime.pm
-#export PREFIX=`perl -V:privlib`
-#${PREFIX##"privlib="}
-
-# force CPAN::FirstTime to not default to manual
-# setup, since initial CPAN setup needs to be automated
-#perl -pi -e'$. == 73 and s/yes/no/' $PREFIX/CPAN/FirstTime.pm
-
-# make CPAN set itself up with defaults and no intervention
-#perl -MCPAN -MCPAN::Config -MCPAN::FirstTime -e'CPAN::FirstTime::init'
-
-# undo the change
-#perl -pi -e'$. == 73 and s/no/yes/' $PREFIX/CPAN/FirstTime.pm
 
 export FTP_PASSIVE=1
 export PERL_MM_USE_DEFAULT=1
