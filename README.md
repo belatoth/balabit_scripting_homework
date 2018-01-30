@@ -11,4 +11,8 @@ the whole serivce is dockerized.
 * `docker build -t "rss_link_collector" -f ./Dockerfile .`
 
 ## Service usage:
-curl http://www.stylusstudio.com/feeds/ | docker run -i rss_link_collector
+`curl http://www.stylusstudio.com/feeds/ | docker run -i rss_link_collector`
+
+or
+
+`cat example.html | docker run -i rss_link_collector`
