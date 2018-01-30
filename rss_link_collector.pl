@@ -20,16 +20,17 @@ use constant FEED_MIME_TYPES => [
     'application/rdf+xml',
 ];
 
-Log::Log4perl::init('log4perl.conf');
+Log::Log4perl::init('/docker/log4perl.conf');
 
-my $logger = Log::Log4perl->get_logger('house.bedrm.desk.topdrwr');
+my $logger = Log::Log4perl->get_logger('rss');
 my %IsFeed = map { $_ => 1 } @{ FEED_MIME_TYPES() };
 my %output_json = (
   rss  => [],
   atom => []
 );
 
-$logger->info("rss_link_collector is running!");
+$logger->info("rss_link_collector started!");
+
 my $page_tree = HTML::TreeBuilder->new();
 while (my $row = <STDIN>) {
   $page_tree->parse($row);
@@ -69,7 +70,6 @@ foreach my $link (@feed_links) {
   }
 }
 
-print "\n";
 print encode_json \%output_json;
 print "\n";
 
