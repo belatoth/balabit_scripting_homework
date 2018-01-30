@@ -12,5 +12,7 @@ the whole serivce is dockerized.
 
 ## Service usage:
 `curl http://www.stylusstudio.com/feeds/ | docker run -i rss_link_collector`
+
 or
+
 `cat example.html | docker run -i rss_link_collector`
